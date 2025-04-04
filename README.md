@@ -1,2 +1,1 @@
-# fblack_box
-Front end app Black Box
+# frotend-react-native
