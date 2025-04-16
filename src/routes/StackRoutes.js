@@ -6,16 +6,16 @@ import HomePage from '../app/(tabs)/home/HomePage';
 import LoginPage from '../app/(auth)/login/LoginPage';
 import DashboardPage from '../app/(tabs)/dashboard/DashboardPage';
 import RegisterPage from '../app/(auth)/register/RegisterPage';
+import TabRoutes from './TabRoutes';
 
 const Stack = createStackNavigator();
 
 export default function StackRoutes() {
   return (
-    <Stack.Navigator initialRouteName="Home">
-      <Stack.Screen name="Home" component={HomePage} />
-      <Stack.Screen name="Login" component={LoginPage} />
-      <Stack.Screen name="Register" component={RegisterPage} />
-      <Stack.Screen name="Dashboard" component={DashboardPage} />
+    <Stack.Navigator initialRouteName="MainApp" header>  
+      <Stack.Screen name="Login" component={LoginPage} options={{headerShown: false}} />
+      <Stack.Screen name="Register" component={RegisterPage} options={{headerShown: false}}/>
+      <Stack.Screen name="MainApp" component={TabRoutes} options={{headerShown: false}}/>
     </Stack.Navigator>
   );
 }
