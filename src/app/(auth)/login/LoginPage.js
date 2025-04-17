@@ -11,7 +11,7 @@ export default function LoginPage({ navigation }) {
   const handleLogin = async () => {
     try {
       await login(email, senha);
-      navigation.replace('Dashboard');
+      navigation.replace('MainApp');
     } catch (e) {
       console.log(e);
     }

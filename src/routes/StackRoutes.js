@@ -12,7 +12,7 @@ const Stack = createStackNavigator();
 
 export default function StackRoutes() {
   return (
-    <Stack.Navigator initialRouteName="MainApp" header>  
+    <Stack.Navigator initialRouteName="Login" header>  
       <Stack.Screen name="Login" component={LoginPage} options={{headerShown: false}} />
       <Stack.Screen name="Register" component={RegisterPage} options={{headerShown: false}}/>
       <Stack.Screen name="MainApp" component={TabRoutes} options={{headerShown: false}}/>

@@ -1,11 +1,14 @@
 import React from 'react';
 import { PaperProvider } from 'react-native-paper';
 import Layout from './src/app/layout';
+import { AuthProvider } from './src/store/AuthContext';
 
 export default function App() {
   return (
-    <PaperProvider>
-      <Layout />
-    </PaperProvider>
+    <AuthProvider>
+      <PaperProvider>
+        <Layout />
+      </PaperProvider>
+    </AuthProvider>
   );
 }
