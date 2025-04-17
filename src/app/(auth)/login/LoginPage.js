@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ScrollView, Image } from 'native-base';
 import { Center, Box, Heading, FormControl, Input, Button, Text, VStack, HStack } from 'native-base';
 import useAuth from '../../../hooks/useAuth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginPage({ navigation }) {
   const [email, setEmail] = useState('');
@@ -10,10 +11,20 @@ export default function LoginPage({ navigation }) {
 
   const handleLogin = async () => {
     try {
-      await login(email, senha);
-      navigation.replace('MainApp');
+      console.log('Iniciando login...');
+      const result = await login(email, senha);
+      console.log('Login bem sucedido:', result);
+      
+      const storedToken = await AsyncStorage.getItem('@auth_token');
+      console.log('Token armazenado após login:', storedToken);
+  
+      if (storedToken) {
+        navigation.replace('MainApp');
+      } else {
+        console.error('Token não foi armazenado corretamente');
+      }
     } catch (e) {
-      console.log(e);
+      console.error('Erro no login:', e);
     }
   };
 
