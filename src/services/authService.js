@@ -36,26 +36,27 @@ export const login = async (email, senha) => {
  * Faz requisição POST em /auth/register
  * Recebe message de sucesso e não retorna token.
  */
-export const registerUser = async (nome, email, senha) => {
-  const url = `${API_URL}/auth/register`;
-  console.log('🔍 Tentando acessar (register):', url);
-
+export const registerUser = async (userData) => {
   try {
-    const response = await api.post('/auth/register', { nome, email, senha });
-    // Exemplo de retorno: { message: "Usuário cadastrado com sucesso" }
-    const data = response.data;
-    
-    console.log(' Resposta da API (register):', data);
-    return data;
+    const response = await api.post('/auth/register', {
+      nome: userData.nome,
+      email: userData.email,
+      senha: userData.senha,
+      cpf: userData.cpf,
+      birthdate: userData.birthdate,
+      cep: userData.cep
+    });
+    return response.data;
   } catch (error) {
     if (error.response) {
-      console.error(' Erro na resposta da API (register):', error.response.data);
+      // O servidor respondeu com um status de erro
+      throw new Error(error.response.data.message || 'Erro ao cadastrar usuário');
     } else if (error.request) {
-      console.error(' Sem resposta da API (register). Requisição para:', url);
-      console.error('Detalhes do erro:', error.message);
+      // A requisição foi feita mas não houve resposta
+      throw new Error('Erro de conexão com o servidor');
     } else {
-      console.error(' Erro inesperado (register):', error.message);
+      // Erro na configuração da requisição
+      throw new Error('Erro ao processar a requisição');
     }
-    throw error;
   }
 };

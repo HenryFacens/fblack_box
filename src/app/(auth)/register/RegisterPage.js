@@ -1,31 +1,149 @@
 import React, { useState } from 'react';
-import { Center, Box, Heading, FormControl, Input, Button, Text, VStack, ScrollView, Image, HStack, Pressable } from 'native-base';
+import { 
+  Center, 
+  Box, 
+  Heading, 
+  FormControl, 
+  Input, 
+  Button, 
+  Text, 
+  VStack, 
+  ScrollView, 
+  Image, 
+  HStack, 
+  Pressable,
+  useToast 
+} from 'native-base';
 import { registerUser } from '../../../services/authService';
+import { validateEmail, validateCPF, validateDate, validateCEP } from '../../../utils/validators';
 
 export default function RegisterPage({ navigation }) {
-  const [nome, setNome] = useState('');
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
+  const [formData, setFormData] = useState({
+    nome: '',
+    email: '',
+    senha: '',
+    cpf: '',
+    birthdate: '',
+    cep: ''
+  });
   const [loading, setLoading] = useState(false);
-  const [mensagem, setMensagem] = useState('');
-  const [erro, setErro] = useState(null);
+  const [errors, setErrors] = useState({});
+  const toast = useToast();
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Validação do nome
+    if (!formData.nome.trim()) {
+      newErrors.nome = 'Nome é obrigatório';
+    }
+
+    // Validação do email
+    if (!validateEmail(formData.email)) {
+      newErrors.email = 'Email inválido';
+    }
+
+    // Validação da senha
+    if (formData.senha.length < 6) {
+      newErrors.senha = 'A senha deve ter no mínimo 6 caracteres';
+    }
+
+    // Validação do CPF
+    if (!validateCPF(formData.cpf)) {
+      newErrors.cpf = 'CPF inválido';
+    }
+
+    // Validação da data de nascimento
+    if (!validateDate(formData.birthdate)) {
+      newErrors.birthdate = 'Data inválida';
+    }
+
+    // Validação do CEP
+    if (!validateCEP(formData.cep)) {
+      newErrors.cep = 'CEP inválido';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    // Limpa o erro do campo quando o usuário começa a digitar
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: null
+      }));
+    }
+  };
 
   const handleRegister = async () => {
+    if (!validateForm()) {
+      toast.show({
+        title: "Erro de validação",
+        description: "Por favor, corrija os campos destacados",
+        status: "error"
+      });
+      return;
+    }
+
     setLoading(true);
-    setErro(null);
-    setMensagem('');
     try {
-      const data = await registerUser(nome, email, senha);
-      setMensagem(data.message);
+      const response = await registerUser(formData);
+      toast.show({
+        title: "Sucesso!",
+        description: "Cadastro realizado com sucesso",
+        status: "success"
+      });
       setTimeout(() => {
         navigation.navigate('Login');
       }, 1500);
     } catch (error) {
-      setErro(error);
+      toast.show({
+        title: "Erro",
+        description: error.message,
+        status: "error"
+      });
     } finally {
       setLoading(false);
     }
   };
+
+  const renderInput = (field, placeholder, type = "text") => (
+    <FormControl isInvalid={!!errors[field]} mb={4}>
+      <FormControl.Label _text={{ color: 'white' }}>
+        {placeholder}
+      </FormControl.Label>
+      <Input
+        variant="outline"
+        placeholder={placeholder}
+        value={formData[field]}
+        onChangeText={(value) => handleInputChange(field, value)}
+        type={type}
+        color="white"
+        borderRadius={10}
+        h={12}
+        fontSize="md"
+        px={4}
+        placeholderTextColor="gray.400"
+        secureTextEntry={type === "password"}
+        _input={{
+          color: "white"
+        }}
+        _focus={{
+          borderColor: "white",
+          backgroundColor: "transparent"
+        }}
+      />
+      <FormControl.ErrorMessage>
+        {errors[field]}
+      </FormControl.ErrorMessage>
+    </FormControl>
+  );
 
   return (
     <ScrollView flex={1} bg="black" paddingTop={50}>
@@ -44,153 +162,12 @@ export default function RegisterPage({ navigation }) {
             </Heading>
 
             <VStack space={4} w="100%">
-
-              <FormControl>
-
-
-                <FormControl>
-                  <FormControl.Label _text={{ color: 'white' }} />
-                  <Input
-                    variant="outline"
-                    placeholder="E-mail"
-                    value={email}
-                    onChangeText={setEmail}
-                    color="white"
-                    borderRadius={10}
-                    h={12}
-                    fontSize="md"
-                    px={4}
-                    placeholderTextColor="gray.400"
-                    autoCapitalize="none"
-                    _input={{
-                      color: "white"
-                    }}
-                    _focus={{
-                      borderColor: "white",
-                      backgroundColor: "transparent"
-                    }}
-                  />
-                </FormControl>
-
-                <FormControl>
-                  <FormControl.Label _text={{ color: 'white' }} />
-                  <Input
-                    variant="outline"
-                    placeholder="Senha"
-                    secureTextEntry
-                    value={senha}
-                    onChangeText={setSenha}
-                    color="white"
-                    borderRadius={10}
-                    h={12}
-                    fontSize="md"
-                    px={4}
-                    placeholderTextColor="gray.400"
-                    _input={{
-                      color: "white"
-                    }}
-                    _focus={{
-                      borderColor: "white",
-                      backgroundColor: "transparent"
-                    }}
-                  />
-                </FormControl>
-
-                <FormControl.Label _text={{ color: 'white' }} />
-                <Input
-                  variant="outline"
-                  placeholder="Nome"
-                  value={nome}
-                  onChangeText={setNome}
-                  color="white"
-                  borderRadius={10}
-                  h={12}
-                  fontSize="md"
-                  px={4}
-                  placeholderTextColor="gray.400"
-                  _input={{
-                    color: "white"
-                  }}
-                  _focus={{
-                    borderColor: "white",
-                    backgroundColor: "transparent"
-                  }}
-                />
-                <FormControl.Label _text={{ color: 'white' }} />
-                <Input
-                  variant="outline"
-                  placeholder="CPF"
-                  value={nome}
-                  onChangeText={setNome}
-                  color="white"
-                  borderRadius={10}
-                  h={12}
-                  fontSize="md"
-                  px={4}
-                  placeholderTextColor="gray.400"
-                  _input={{
-                    color: "white"
-                  }}
-                  _focus={{
-                    borderColor: "white",
-                    backgroundColor: "transparent"
-                  }}
-                />
-                <FormControl.Label _text={{ color: 'white' }} />
-                <Text color="white" mb={1}>Data de Nascimento</Text>
-                <Input
-                  variant="outline"
-                  placeholder="DD/MM/AAAA"
-                  value={nome}
-                  onChangeText={setNome}
-                  color="white"
-                  borderRadius={10}
-                  h={12} // Reduzido de 16 para 12  
-                  fontSize="sm" // Reduzido de md para sm  
-                  px={4}
-                  placeholderTextColor="gray.400"
-                  _input={{
-                    color: "white"
-                  }}
-                  _focus={{
-                    borderColor: "white",
-                    backgroundColor: "transparent"
-                  }}
-                />
-                <FormControl.Label _text={{ color: 'white' }} />
-                <Text color="white" mb={1}>Endereço</Text>
-                <Input
-                  variant="outline"
-                  placeholder="Av. Brasil, 1234"
-                  value={nome}
-                  onChangeText={setNome}
-                  color="white"
-                  borderRadius={10}
-                  h={12}
-                  fontSize="md"
-                  px={4}
-                  placeholderTextColor="gray.400"
-                  _input={{
-                    color: "white"
-                  }}
-                  _focus={{
-                    borderColor: "white",
-                    backgroundColor: "transparent"
-                  }}
-                />
-              </FormControl>
-
-
-              {erro && (
-                <Text color="red.400" textAlign="center">
-                  Erro ao cadastrar. Verifique seus dados.
-                </Text>
-              )}
-              {mensagem && (
-                <Text color="green.400" textAlign="center">
-                  {mensagem}
-                </Text>
-              )}
+              {renderInput("nome", "Nome")}
+              {renderInput("email", "E-mail", "email")}
+              {renderInput("senha", "Senha", "password")}
+              {renderInput("cpf", "CPF")}
+              {renderInput("birthdate", "Data de Nascimento (DD/MM/AAAA)")}
+              {renderInput("cep", "CEP")}
 
               <Button
                 bg="white"
