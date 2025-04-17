@@ -31,12 +31,26 @@ const customTheme = extendTheme({
   },
 });
 
+const linking = {
+  prefixes: ['http://localhost:8081'],
+  config: {
+    screens: {
+      Login: 'login',
+      Register: 'register',
+      ForgotPassword: 'forgot-password',
+      ResetPassword: 'reset-password',
+      ResetPasswordForm: 'reset-password-form',
+      MainApp: 'main',
+    },
+  },
+};
+
 export default function Layout() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
         <NativeBaseProvider theme={customTheme}>
-          <NavigationContainer>
+          <NavigationContainer linking={linking}>
             <StackRoutes />
           </NavigationContainer>
         </NativeBaseProvider>

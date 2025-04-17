@@ -119,9 +119,9 @@ export default function LoginPage({ navigation }) {
                   color: 'white',
                   fontWeight: 'bold' // Opcional: deixa o texto em negrito
                 }}
-                onPress={handleLogin}
-                isLoading={loading}
-                isDisabled={loading}
+                onPress={() => navigation.navigate('ForgotPassword')}
+                //isLoading={loading}
+                //isDisabled={loading}
                 borderRadius={20}
                 _pressed={{ // Estilo quando o botão é pressionado
                   bg: 'gray.100'
