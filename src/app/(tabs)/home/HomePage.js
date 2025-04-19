@@ -4,10 +4,10 @@ import { HeroSection, TeamSection, FeaturesSection, CallToActionSection } from '
 
 export default function HomePage({ navigation }) {
   return (
-    <ScrollView flex={1} bg="black">
+    <ScrollView flex={1} bg="black" >
       {/* Seção de destaque (Hero) */}
       <HeroSection />
-
+      
       {/* Seção da equipe */}
       <TeamSection />
 
