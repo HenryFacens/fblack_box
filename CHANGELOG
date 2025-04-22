@@ -1,0 +1,51 @@
+# 📦 Changelog - Black Box Mobile (Frontend)
+
+Este changelog documenta as principais mudanças aplicadas ao app mobile do projeto **Black Box**, incluindo melhorias na autenticação, integração com o backend e refatorações importantes.
+
+---
+
+## [1.0.1] - 2025-04-17
+
+### ♻️ Refatorado
+
+#### 🔐 `authService.js`
+- Refatorado para utilizar `accessToken` e `refreshToken` no padrão do backend atualizado.
+- Armazenamento seguro no `AsyncStorage` com chaves `@auth_token` e `@refresh_token`.
+- Substituição de `token` simples por objeto `{ accessToken, refreshToken }`, compatível com o novo backend.
+- Adição de `console.log()` informativos e tratativas de erro com mensagens mais claras.
+
+#### 💡 Por que parece menor, mas não é?
+Embora visualmente o novo `authService.js` pareça menor, ele foi apenas **modularizado** e ficou mais conciso. O tratamento de erro e o armazenamento agora seguem boas práticas modernas com responsabilidade dividida entre service e hook.
+
+---
+
+#### 🧠 `useAuth.js`
+- Agora importa e utiliza o `loginService` diretamente de `authService.js`, centralizando a responsabilidade de requisição HTTP no service.
+- Remoção de código duplicado relacionado a requisições `axios` dentro do hook.
+- Inclusão de loading, erro e token com melhor controle de estado e simplificação do interceptor global.
+
+🔄 **Importante:** A lógica de verificação, armazenamento e uso do token JWT foi mantida — apenas movida para uma estrutura mais reutilizável e desacoplada.
+
+---
+
+### 🛠️ Ajustado
+- Atualização do `API_URL` em todo o projeto para utilizar o IP local da rede (removendo `localhost`). Agora utiliza `Constants.expoConfig.extra.API_URL` de forma centralizada.
+
+### 📱 Integrado com Expo
+- O app agora funciona perfeitamente via Expo Go, com o IP do backend configurado automaticamente no `.env`.
+
+### 🧼 Componentes ajustados:
+- `FeedScreen.js` e `ProfileScreen.js` atualizados para carregar imagens do servidor via IP correto
+- URLs como `http://localhost:3000/...` substituídas por `API_URL.replace('/api', '')`
+
+---
+
+## [0.1.0] - 2025-04-10
+
+### Adicionado
+- Estrutura inicial do app com React Native e Native Base
+- Telas de Login, Cadastro, Feed e Perfil
+- Integração básica com backend local (requisições com `localhost`)
+
+---
+
