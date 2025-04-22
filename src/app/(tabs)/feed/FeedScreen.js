@@ -4,6 +4,8 @@ import { Box, VStack, HStack, Avatar, Text, Pressable, Icon, Image, Spinner } fr
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import useAuth from '../../../hooks/useAuth';
+import { API_URL } from '../../../config/constants';
+
 
 export default function FeedScreen({ navigation }) {
   const [posts, setPosts] = useState([]);
@@ -23,7 +25,7 @@ export default function FeedScreen({ navigation }) {
         return;
       }
   
-      const response = await axios.get('http://localhost:3000/api/reporte/get', {
+      const response = await axios.get(`${API_URL}/reporte/get`, {
         headers: {
           Authorization: `Bearer ${currentToken}`
         }
@@ -77,10 +79,10 @@ export default function FeedScreen({ navigation }) {
         <HStack space={3} alignItems="flex-start">
           <Avatar
             size="md"
-            source={{ 
-              uri: post.fotoPerfil.startsWith('http') 
-                ? post.fotoPerfil 
-                : `http://localhost:3000/${post.fotoPerfil}`
+            source={{
+              uri: post.fotoPerfil.startsWith('http')
+                ? post.fotoPerfil
+                : `${API_URL.replace('/api', '')}/${post.fotoPerfil}`
             }}
             fallbackSource={{
               uri: "https://via.placeholder.com/50"
@@ -127,7 +129,7 @@ export default function FeedScreen({ navigation }) {
             {post.imagemReporte && (
               <Box mt={2}>
                 <Image
-                  source={{ uri: `http://localhost:3000/${post.imagemReporte}` }}
+                  source={{ uri: `${API_URL.replace('/api', '')}/${post.imagemReporte}` }}
                   alt="Post image"
                   borderRadius={12}
                   height={200}

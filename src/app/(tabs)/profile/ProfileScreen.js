@@ -21,7 +21,7 @@ export default function ProfileScreen() {
     const fetchMyPosts = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:3000/api/reporte/me', {
+        const response = await axios.get(`${API_URL}/reporte/me`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setPosts(response.data.data);
@@ -30,7 +30,7 @@ export default function ProfileScreen() {
         if (response.data.data.length > 0) {
           setUser({
             nome: response.data.data[0].nomePerfil,
-            fotoPerfil: `http://localhost:3000/${response.data.data[0].fotoPerfil}`,
+            fotoPerfil: `${API_URL.replace('/api', '')}/${response.data.data[0].fotoPerfil}`,
             username: response.data.data[0].nomePerfil.toLowerCase().replace(/\s/g, ''),
             seguindo: 0, // Substitua pelo valor real se tiver
             seguidores: 0, // Substitua pelo valor real se tiver
@@ -130,7 +130,7 @@ export default function ProfileScreen() {
                 </Text>
                 {post.imagemReporte && (
                   <Image
-                    source={{ uri: `http://localhost:3000/${post.imagemReporte}` }}
+                    source={{ uri: `${API_URL.replace('/api', '')}/${post.imagemReporte}` }}
                     alt="Imagem do post"
                     borderRadius={8}
                     height={200}
