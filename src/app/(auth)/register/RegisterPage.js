@@ -17,6 +17,7 @@ import {
 import { registerUser } from '../../../services/authService';
 import { validateEmail, validateCPF, validateDate, validateCEP } from '../../../utils/validators';
 
+
 export default function RegisterPage({ navigation }) {
   const [formData, setFormData] = useState({
     nome: '',
