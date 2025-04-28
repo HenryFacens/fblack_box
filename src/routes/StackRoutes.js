@@ -8,6 +8,7 @@ import TabRoutes from './TabRoutes';
 import ForgotPasswordPage from '../app/(auth)/forgot/ForgotPage';
 import ResetPasswordPage from '../app/(auth)/resetPassword/resetPage';
 import ResetPasswordRedirect from '../components/auth/ResetPasswordRedirect';
+import EditProfileScreen from '../app/(tabs)/profile/EditProfile';
 
 const Stack = createStackNavigator();
 
@@ -22,6 +23,8 @@ export default function StackRoutes() {
       {/* Rota do formulário de redefinição */}
       <Stack.Screen name="ResetPasswordForm" component={ResetPasswordPage} options={{headerShown: false}} />
       <Stack.Screen name="MainApp" component={TabRoutes} options={{headerShown: false}}/>
+      <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{headerShown: false}} />
+
     </Stack.Navigator>
   );
 }

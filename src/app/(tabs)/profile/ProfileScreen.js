@@ -92,6 +92,7 @@ export default function ProfileScreen({ navigation }) {
           py={2}
           px={8}
           mt={2}
+          onPress={() => navigation.navigate('EditProfile')}
         >
           <Text color="white" fontWeight="bold">Editar Perfil</Text>
         </Pressable>
