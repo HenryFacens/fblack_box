@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, VStack, HStack, Avatar, Text, Button, Spinner, Box, Image } from 'native-base';
+import { ScrollView, VStack, HStack, Avatar, Text, Spinner, Box, Image, Pressable, Icon } from 'native-base';
+import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import useAuth from '../../../hooks/useAuth';
 
-export default function ProfileScreen({ navigation }) {  // Recebe navigation
+export default function ProfileScreen({ navigation }) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { token } = useAuth();
@@ -44,24 +45,20 @@ export default function ProfileScreen({ navigation }) {  // Recebe navigation
     if (token) fetchMyPosts();
   }, [token]);
 
+  const handleGoBack = () => {
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'MainApp' }],
+    });
+  };
+
   return (
     <ScrollView flex={1} bg="black">
-      <VStack space={4} pt={50} px={4}>
-        {/* Botão Voltar */}
-        <Button 
-          variant="outline" 
-          borderColor="gray.600"
-          _text={{ color: "white" }}
-          borderRadius="full"
-          py={2}
-          mb={4}
-          onPress={() => navigation.reset({
-            index: 0,
-            routes: [{ name: 'MainApp' }],
-          })} // Ajuste o nome da tela inicial se necessário
-        >
-          Voltar para Página Inicial
-        </Button>
+      <VStack space={4} pt={12} px={4}>
+        {/* Botão Voltar estilo ícone */}
+        <Pressable onPress={handleGoBack} alignSelf="flex-start" mb={4} hitSlop={10}>
+          <Icon as={Ionicons} name="arrow-back-outline" size={7} color="white" />
+        </Pressable>
 
         <Avatar 
           size="2xl" 
@@ -87,16 +84,17 @@ export default function ProfileScreen({ navigation }) {  // Recebe navigation
           </VStack>
         </HStack>
 
-        <Button 
-          variant="outline" 
+        <Pressable
+          alignSelf="center"
+          borderWidth={1}
           borderColor="gray.600"
-          _text={{ color: "white" }}
           borderRadius="full"
           py={2}
+          px={8}
           mt={2}
         >
-          Editar Perfil
-        </Button>
+          <Text color="white" fontWeight="bold">Editar Perfil</Text>
+        </Pressable>
 
         <HStack 
           justifyContent="space-between" 
@@ -170,4 +168,4 @@ export default function ProfileScreen({ navigation }) {  // Recebe navigation
       </VStack>
     </ScrollView>
   );
-}
+} 
