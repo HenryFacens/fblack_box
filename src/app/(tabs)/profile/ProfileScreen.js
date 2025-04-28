@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, VStack, HStack, Avatar, Text, Button, Spinner, Box, Image } from 'native-base';
 import axios from 'axios';
-import useAuth from '../../../hooks/useAuth'; // Supondo que você já tem esse hook
+import useAuth from '../../../hooks/useAuth';
 
-export default function ProfileScreen() {
+export default function ProfileScreen({ navigation }) {  // Recebe navigation
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { token } = useAuth();
 
-  // Dados do usuário (você pode obter do token ou de outro endpoint)
   const [user, setUser] = useState({
     nome: '',
     fotoPerfil: '',
@@ -26,14 +25,13 @@ export default function ProfileScreen() {
         });
         setPosts(response.data.data);
 
-        // Se quiser pegar dados do usuário do primeiro post:
         if (response.data.data.length > 0) {
           setUser({
             nome: response.data.data[0].nomePerfil,
             fotoPerfil: `https://bblackbox-f3btf4c3g7fydhaf.westus-01.azurewebsites.net/${response.data.data[0].fotoPerfil}`,
             username: response.data.data[0].nomePerfil.toLowerCase().replace(/\s/g, ''),
-            seguindo: 0, // Substitua pelo valor real se tiver
-            seguidores: 0, // Substitua pelo valor real se tiver
+            seguindo: 0,
+            seguidores: 0,
           });
         }
       } catch (err) {
@@ -49,6 +47,22 @@ export default function ProfileScreen() {
   return (
     <ScrollView flex={1} bg="black">
       <VStack space={4} pt={50} px={4}>
+        {/* Botão Voltar */}
+        <Button 
+          variant="outline" 
+          borderColor="gray.600"
+          _text={{ color: "white" }}
+          borderRadius="full"
+          py={2}
+          mb={4}
+          onPress={() => navigation.reset({
+            index: 0,
+            routes: [{ name: 'MainApp' }],
+          })} // Ajuste o nome da tela inicial se necessário
+        >
+          Voltar para Página Inicial
+        </Button>
+
         <Avatar 
           size="2xl" 
           source={{ uri: user.fotoPerfil || 'https://via.placeholder.com/150' }}
@@ -104,7 +118,6 @@ export default function ProfileScreen() {
           </VStack>
         </HStack>
 
-        {/* Lista de Posts do usuário */}
         <VStack space={4}>
           {loading ? (
             <Box alignItems="center" py={10}>
@@ -130,7 +143,7 @@ export default function ProfileScreen() {
                 </Text>
                 {post.imagemReporte && (
                   <Image
-                    source={{ uri: `http://localhost:3000/${post.imagemReporte}` }}
+                    source={{ uri: `https://bblackbox-f3btf4c3g7fydhaf.westus-01.azurewebsites.net/${post.imagemReporte}` }}
                     alt="Imagem do post"
                     borderRadius={8}
                     height={200}
