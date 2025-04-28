@@ -21,7 +21,7 @@ export default function ProfileScreen() {
     const fetchMyPosts = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:3000/api/reporte/me', {
+        const response = await axios.get('https://bblackbox-f3btf4c3g7fydhaf.westus-01.azurewebsites.net/api/reporte/me', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setPosts(response.data.data);
@@ -30,7 +30,7 @@ export default function ProfileScreen() {
         if (response.data.data.length > 0) {
           setUser({
             nome: response.data.data[0].nomePerfil,
-            fotoPerfil: `http://localhost:3000/${response.data.data[0].fotoPerfil}`,
+            fotoPerfil: `https://bblackbox-f3btf4c3g7fydhaf.westus-01.azurewebsites.net/${response.data.data[0].fotoPerfil}`,
             username: response.data.data[0].nomePerfil.toLowerCase().replace(/\s/g, ''),
             seguindo: 0, // Substitua pelo valor real se tiver
             seguidores: 0, // Substitua pelo valor real se tiver

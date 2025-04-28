@@ -54,7 +54,7 @@ const useAuth = () => {
       setLoading(true);
       setError(null);
 
-      const response = await axios.post('http://localhost:3000/api/auth/login', {
+      const response = await axios.post('https://bblackbox-f3btf4c3g7fydhaf.westus-01.azurewebsites.net/api/auth/login', {
         email,
         senha
       });

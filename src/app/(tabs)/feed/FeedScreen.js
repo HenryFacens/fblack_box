@@ -9,35 +9,35 @@ export default function FeedScreen({ navigation }) {
   const [posts, setPosts] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); // Adicionando estado local para erro
-  const { token, checkToken } = useAuth();
+  const [error, setError] = useState(null);
+  const { token, checkToken, logout } = useAuth(); // Adicionei logout aqui
 
   const fetchPosts = async () => {
     try {
-      const currentToken = await checkToken(); // Força uma verificação do token
-      console.log('Token atual:', currentToken); // Debug
-  
+      const currentToken = await checkToken();
+      console.log('Token atual:', currentToken);
+
       if (!currentToken) {
-        console.log('Token não encontrado, redirecionando para login...'); // Debug
+        console.log('Token não encontrado, redirecionando para login...');
         navigation.replace('Login');
         return;
       }
-  
-      const response = await axios.get('http://localhost:3000/api/reporte/get', {
+
+      const response = await axios.get('https://bblackbox-f3btf4c3g7fydhaf.westus-01.azurewebsites.net/api/reporte/get', {
         headers: {
           Authorization: `Bearer ${currentToken}`
         }
       });
-  
-      console.log('Resposta da API:', response.data); // Debug
+
+      console.log('Resposta da API:', response.data);
       setPosts(response.data.data);
       setError(null);
     } catch (err) {
-      console.error('Erro completo ao buscar posts:', err); // Debug
+      console.error('Erro completo ao buscar posts:', err);
       setError(err.response?.data?.message || 'Erro ao carregar posts');
-      
+
       if (err.response?.status === 401) {
-        console.log('Token inválido, redirecionando para login...'); // Debug
+        console.log('Token inválido, redirecionando para login...');
         navigation.replace('Login');
       }
     } finally {
@@ -64,6 +64,13 @@ export default function FeedScreen({ navigation }) {
     return `${Math.floor(diffInMinutes / 1440)}d`;
   };
 
+  const handleLogout = () => {
+    if (logout) {
+      logout(); // Se sua função logout limpa o token ou faz outras limpezas
+    }
+    navigation.replace('Login');
+  };
+
   const PostCard = ({ post }) => (
     <Pressable>
       <Box
@@ -80,7 +87,7 @@ export default function FeedScreen({ navigation }) {
             source={{ 
               uri: post.fotoPerfil.startsWith('http') 
                 ? post.fotoPerfil 
-                : `http://localhost:3000/${post.fotoPerfil}`
+                : `https://bblackbox-f3btf4c3g7fydhaf.westus-01.azurewebsites.net/${post.fotoPerfil}`
             }}
             fallbackSource={{
               uri: "https://via.placeholder.com/50"
@@ -127,7 +134,7 @@ export default function FeedScreen({ navigation }) {
             {post.imagemReporte && (
               <Box mt={2}>
                 <Image
-                  source={{ uri: `http://localhost:3000/${post.imagemReporte}` }}
+                  source={{ uri: `https://bblackbox-f3btf4c3g7fydhaf.westus-01.azurewebsites.net/${post.imagemReporte}` }}
                   alt="Post image"
                   borderRadius={12}
                   height={200}
@@ -178,17 +185,25 @@ export default function FeedScreen({ navigation }) {
       borderBottomWidth={0.5}
       borderBottomColor="gray.800"
       bg="black"
+      flexDirection="row"
+      alignItems="center"
+      justifyContent="space-between"
     >
-      <Image
-        source={require('../../../../assets/solar_box-linear.png')}
-        alt="Logo"
-        width={10}
-        height={10}
-        resizeMode="contain"
-      />
-      <Text color="white" fontSize="xl" fontWeight="bold">
-        Página Inicial
-      </Text>
+      <HStack alignItems="center" space={2}>
+        <Image
+          source={require('../../../../assets/solar_box-linear.png')}
+          alt="Logo"
+          width={10}
+          height={10}
+          resizeMode="contain"
+        />
+        <Text color="white" fontSize="xl" fontWeight="bold">
+          Página Inicial
+        </Text>
+      </HStack>
+      <Pressable onPress={handleLogout} hitSlop={10}>
+        <Icon as={Ionicons} name="log-out-outline" color="white" size={6} />
+      </Pressable>
     </Box>
   );
 
