@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, VStack, Input, Button, Text, Box, Avatar, Spinner, useToast } from 'native-base';
+import { ScrollView, VStack, Input, Button, Text, Box, Avatar, Spinner, useToast, Pressable, Icon } from 'native-base';
+import { Ionicons } from '@expo/vector-icons';  // Import do Ionicons
 import axios from 'axios';
 import useAuth from '../../../hooks/useAuth';
 
@@ -19,7 +20,6 @@ export default function EditProfileScreen({ navigation }) {
     fotoPerfil: '',
   });
 
-  // Carregar dados atuais do usuário ao montar a tela
   useEffect(() => {
     const fetchUserData = async () => {
       setLoading(true);
@@ -31,7 +31,7 @@ export default function EditProfileScreen({ navigation }) {
         setUserData({
           nome: user.nome || '',
           email: user.email || '',
-          senha: '', // senha não deve ser preenchida por segurança
+          senha: '',
           birthdate: user.birthdate || '',
           cep: user.cep || '',
           fotoPerfil: user.fotoPerfil ? `http://localhost:3000/${user.fotoPerfil}` : '',
@@ -49,11 +49,10 @@ export default function EditProfileScreen({ navigation }) {
   const handleSave = async () => {
     setSaving(true);
     try {
-      // Ajuste o endpoint e payload conforme sua API
       await axios.put('http://localhost:3000/api/user/update', {
         nome: userData.nome,
         email: userData.email,
-        senha: userData.senha, // envie somente se o usuário alterou
+        senha: userData.senha,
         birthdate: userData.birthdate,
         cep: userData.cep,
         fotoPerfil: userData.fotoPerfil,
@@ -70,6 +69,13 @@ export default function EditProfileScreen({ navigation }) {
     }
   };
 
+  const handleGoBack = () => {
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'MainApp' }],
+    });
+  };
+
   if (loading) {
     return (
       <Box flex={1} bg="black" justifyContent="center" alignItems="center">
@@ -81,6 +87,11 @@ export default function EditProfileScreen({ navigation }) {
   return (
     <ScrollView flex={1} bg="black" px={4} pt={10}>
       <VStack space={6}>
+        {/* Botão de voltar corrigido */}
+        <Pressable onPress={handleGoBack} alignSelf="flex-start" mb={4} hitSlop={10}>
+          <Icon as={Ionicons} name="arrow-back-outline" size={7} color="white" />
+        </Pressable>
+
         <Avatar 
           size="2xl" 
           source={{ uri: userData.fotoPerfil || 'https://via.placeholder.com/150' }} 
@@ -89,6 +100,7 @@ export default function EditProfileScreen({ navigation }) {
           borderColor="gray.700"
         />
 
+        {/* ... resto dos inputs e botão Salvar */}
         <Input
           variant="filled"
           placeholder="Nome"
@@ -158,8 +170,8 @@ export default function EditProfileScreen({ navigation }) {
             bg: 'gray.100',
           }}
           py={3}
-          px={8}          // padding horizontal para largura confortável
-          alignSelf="center"  // centraliza o botão horizontalmente
+          px={8}
+          alignSelf="center"
           w="auto"
         >
           {saving ? 'Salvando...' : 'Salvar'}
