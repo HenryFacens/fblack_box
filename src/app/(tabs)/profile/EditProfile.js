@@ -30,7 +30,10 @@ export default function EditProfileScreen({ navigation }) {
         const user = response.data.data;
         setUserData({
           nome: user.nome || '',
-          username: user.username || '',
+          email: user.email || '',
+          senha: '', // senha não deve ser preenchida por segurança
+          birthdate: user.birthdate || '',
+          cep: user.cep || '',
           fotoPerfil: user.fotoPerfil ? `http://localhost:3000/${user.fotoPerfil}` : '',
         });
       } catch (error) {
@@ -49,14 +52,17 @@ export default function EditProfileScreen({ navigation }) {
       // Ajuste o endpoint e payload conforme sua API
       await axios.put('http://localhost:3000/api/user/update', {
         nome: userData.nome,
-        username: userData.username,
-        fotoPerfil: userData.fotoPerfil, // Pode ser URL ou outro formato conforme API
+        email: userData.email,
+        senha: userData.senha, // envie somente se o usuário alterou
+        birthdate: userData.birthdate,
+        cep: userData.cep,
+        fotoPerfil: userData.fotoPerfil,
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
       toast.show({ description: 'Perfil atualizado com sucesso!' });
-      navigation.goBack(); // Voltar para a tela anterior
+      navigation.goBack();
     } catch (error) {
       toast.show({ description: 'Erro ao salvar perfil.' });
     } finally {
@@ -96,8 +102,10 @@ export default function EditProfileScreen({ navigation }) {
         <Input
           variant="filled"
           placeholder="Email"
+          keyboardType="email-address"
+          autoCapitalize="none"
           value={userData.email}
-          onChangeText={(text) => setUserData({ ...userData, username: text })}
+          onChangeText={(text) => setUserData({ ...userData, email: text })}
           bg="gray.800"
           color="white"
           borderRadius="md"
@@ -106,8 +114,9 @@ export default function EditProfileScreen({ navigation }) {
         <Input
           variant="filled"
           placeholder="Senha"
+          secureTextEntry
           value={userData.senha}
-          onChangeText={(text) => setUserData({ ...userData, username: text })}
+          onChangeText={(text) => setUserData({ ...userData, senha: text })}
           bg="gray.800"
           color="white"
           borderRadius="md"
@@ -115,9 +124,9 @@ export default function EditProfileScreen({ navigation }) {
 
         <Input
           variant="filled"
-          placeholder="Birthdate"
+          placeholder="Data de Nascimento"
           value={userData.birthdate}
-          onChangeText={(text) => setUserData({ ...userData, username: text })}
+          onChangeText={(text) => setUserData({ ...userData, birthdate: text })}
           bg="gray.800"
           color="white"
           borderRadius="md"
@@ -126,22 +135,34 @@ export default function EditProfileScreen({ navigation }) {
         <Input
           variant="filled"
           placeholder="CEP"
+          keyboardType="numeric"
           value={userData.cep}
-          onChangeText={(text) => setUserData({ ...userData, username: text })}
+          onChangeText={(text) => setUserData({ ...userData, cep: text })}
           bg="gray.800"
           color="white"
           borderRadius="md"
         />
 
-        <Button 
-          isLoading={saving}
+        <Button
+          mt={2}
+          bg="white"
+          _text={{
+            color: 'black',
+            fontWeight: 'bold',
+          }}
           onPress={handleSave}
-          bg="blue.600"
-          _pressed={{ bg: "blue.700" }}
-          borderRadius="full"
+          isLoading={saving}
+          isDisabled={saving}
+          borderRadius={20}
+          _pressed={{
+            bg: 'gray.100',
+          }}
           py={3}
+          px={8}          // padding horizontal para largura confortável
+          alignSelf="center"  // centraliza o botão horizontalmente
+          w="auto"
         >
-          Salvar
+          {saving ? 'Salvando...' : 'Salvar'}
         </Button>
       </VStack>
     </ScrollView>
