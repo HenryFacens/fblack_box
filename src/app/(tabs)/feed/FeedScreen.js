@@ -66,117 +66,208 @@ export default function FeedScreen({ navigation }) {
 
   const handleLogout = () => {
     if (logout) {
-      logout(); // Se sua função logout limpa o token ou faz outras limpezas
+      logout(); 
     }
     navigation.replace('Login');
   };
 
-  const PostCard = ({ post }) => (
-    <Pressable>
-      <Box
-        borderBottomWidth={0.5}
-        borderBottomColor="gray.800"
-        p={4}
-        _pressed={{
-          bg: "gray.900"
-        }}
-      >
-        <HStack space={3} alignItems="flex-start">
-          <Avatar
-            size="md"
-            source={{ 
-              uri: post.fotoPerfil.startsWith('http') 
-                ? post.fotoPerfil 
-                : `https://bblackbox-f3btf4c3g7fydhaf.westus-01.azurewebsites.net/${post.fotoPerfil}`
-            }}
-            fallbackSource={{
-              uri: "https://via.placeholder.com/50"
-            }}
-          />
-          <VStack flex={1} space={2}>
-            <HStack justifyContent="space-between" alignItems="center">
-              <HStack space={1} alignItems="center">
-                <Text color="white" fontWeight="bold">{post.nomePerfil}</Text>
-                <Text color="gray.500">·</Text>
-                <Text color="gray.500">{formatTimeAgo(post.horarioReporte)}</Text>
+  const PostCard = ({ post }) => {
+    // Estado local para likes e liked
+    const [likes, setLikes] = useState(post.likes);
+    const [liked, setLiked] = useState(false);
+    const [dislikes, setDislikes] = useState(post.dislikes);
+    const [disliked, setDisliked] = useState(false);
+
+    // Função para lidar com like via API
+    const handleLike = async () => {
+      try {
+        const currentToken = await checkToken();
+        if (!currentToken) {
+          navigation.replace('Login');
+          return;
+        }
+
+        const response = await axios.post(
+          `https://bblackbox-f3btf4c3g7fydhaf.westus-01.azurewebsites.net/api/reporte/${post.id}/interagir`,
+          { tipo: 'like' },
+          {
+            headers: {
+              Authorization: `Bearer ${currentToken}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          // Atualiza o estado local baseado na interação
+          if (liked) {
+            setLikes(likes - 1);
+            setLiked(false);
+          } else {
+            setLikes(likes + 1);
+            setLiked(true);
+            if (disliked) {
+              setDislikes(dislikes - 1);
+              setDisliked(false);
+            }
+          } 
+        }
+      } catch (error) {
+        console.error('Erro ao interagir com o post:', error);
+      }
+    };
+
+    const handleDislike = async () => {
+      try {
+        const currentToken = await checkToken();
+        if (!currentToken) {
+          navigation.replace('Login');
+          return;
+        }
+
+        const response = await axios.post(
+          `https://bblackbox-f3btf4c3g7fydhaf.westus-01.azurewebsites.net/api/reporte/${post.id}/interagir`,
+          { tipo: 'like' },
+          {
+            headers: {
+              Authorization: `Bearer ${currentToken}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        if (response.status === 200) {
+          if (disliked) {
+            // Removeu dislike
+            setDislikes(dislikes - 1);
+            setDisliked(false);
+          } else {
+            // Adicionou dislike
+            setDislikes(dislikes + 1);
+            setDisliked(true);
+            // Se estava liked, remove like
+            if (liked) {
+              setLikes(likes - 1);
+              setLiked(false);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao interagir com o post:', error);
+      }
+    };
+
+    return (
+      <Pressable>
+        <Box
+          borderBottomWidth={0.5}
+          borderBottomColor="gray.800"
+          p={4}
+          _pressed={{
+            bg: "gray.900"
+          }}
+        >
+          <HStack space={3} alignItems="flex-start">
+            <Avatar
+              size="md"
+              source={{ 
+                uri: post.fotoPerfil.startsWith('http') 
+                  ? post.fotoPerfil 
+                  : `https://bblackbox-f3btf4c3g7fydhaf.westus-01.azurewebsites.net/${post.fotoPerfil}`
+              }}
+              fallbackSource={{
+                uri: "https://via.placeholder.com/50"
+              }}
+            />
+            <VStack flex={1} space={2}>
+              <HStack justifyContent="space-between" alignItems="center">
+                <HStack space={1} alignItems="center">
+                  <Text color="white" fontWeight="bold">{post.nomePerfil}</Text>
+                  <Text color="gray.500">·</Text>
+                  <Text color="gray.500">{formatTimeAgo(post.horarioReporte)}</Text>
+                </HStack>
+                <Pressable>
+                  <Icon
+                    as={Ionicons}
+                    name="ellipsis-horizontal"
+                    color="gray.500"
+                    size={5}
+                  />
+                </Pressable>
               </HStack>
-              <Pressable>
-                <Icon
-                  as={Ionicons}
-                  name="ellipsis-horizontal"
-                  color="gray.500"
-                  size={5}
-                />
-              </Pressable>
-            </HStack>
 
-            <Text color="white" fontSize="md">
-              {post.descricaoReporte}
-            </Text>
-
-            <Text color="gray.500" fontSize="sm">
-              📍 {post.localizacaoReporte}
-            </Text>
-
-            <HStack space={2} mt={1}>
-              <Text color="gray.400" fontSize="sm">
-                Categoria: {post.categoriaReporte}
+              <Text color="white" fontSize="md">
+                {post.descricaoReporte}
               </Text>
-              <Text color="gray.400">•</Text>
-              <Text 
-                color={post.statusReporte === 'Resolvido' ? 'green.500' : 'yellow.500'} 
-                fontSize="sm"
-              >
-                {post.statusReporte}
+
+              <Text color="gray.500" fontSize="sm">
+                📍 {post.localizacaoReporte}
               </Text>
-            </HStack>
 
-            {post.imagemReporte && (
-              <Box mt={2}>
-                <Image
-                  source={{ uri: `https://bblackbox-f3btf4c3g7fydhaf.westus-01.azurewebsites.net/${post.imagemReporte}` }}
-                  alt="Post image"
-                  borderRadius={12}
-                  height={200}
-                  width="100%"
-                  fallbackSource={{
-                    uri: "https://via.placeholder.com/400x200"
-                  }}
-                />
-              </Box>
-            )}
+              <HStack space={2} mt={1}>
+                <Text color="gray.400" fontSize="sm">
+                  Categoria: {post.categoriaReporte}
+                </Text>
+                <Text color="gray.400">•</Text>
+                <Text 
+                  color={post.statusReporte === 'Resolvido' ? 'green.500' : 'yellow.500'} 
+                  fontSize="sm"
+                >
+                  {post.statusReporte}
+                </Text>
+              </HStack>
 
-            <HStack space={6} mt={3}>
-              <Pressable>
-                <HStack space={2} alignItems="center">
-                  <Icon as={Ionicons} name="chatbubble-outline" color="gray.500" size={5} />
-                  <Text color="gray.500">{post.comentarios.length}</Text>
-                </HStack>
-              </Pressable>
+              {post.imagemReporte && (
+                <Box mt={2}>
+                  <Image
+                    source={{ uri: `https://bblackbox-f3btf4c3g7fydhaf.westus-01.azurewebsites.net/${post.imagemReporte}` }}
+                    alt="Post image"
+                    borderRadius={12}
+                    height={200}
+                    width="100%"
+                    fallbackSource={{
+                      uri: "https://via.placeholder.com/400x200"
+                    }}
+                  />
+                </Box>
+              )}
 
-              <Pressable>
-                <HStack space={2} alignItems="center">
-                  <Icon as={Ionicons} name="heart-outline" color="gray.500" size={5} />
-                  <Text color="gray.500">{post.likes}</Text>
-                </HStack>
-              </Pressable>
+              <HStack space={6} mt={3}>
+                <Pressable>
+                  <HStack space={2} alignItems="center">
+                    <Icon as={Ionicons} name="chatbubble-outline" color="gray.500" size={5} />
+                    <Text color="gray.500">{post.comentarios.length}</Text>
+                  </HStack>
+                </Pressable>
 
-              <Pressable>
-                <HStack space={2} alignItems="center">
-                  <Icon as={Ionicons} name="thumbs-down-outline" color="gray.500" size={5} />
-                  <Text color="gray.500">{post.dislikes}</Text>
-                </HStack>
-              </Pressable>
+                <Pressable onPress={handleLike}>
+                  <HStack space={2} alignItems="center">
+                    <Icon 
+                      as={Ionicons} 
+                      name={liked ? "heart" : "heart-outline"} 
+                      color={liked ? "red.500" : "gray.500"} 
+                      size={5} 
+                    />
+                    <Text color={liked ? "red.500" : "gray.500"}>{likes}</Text>
+                  </HStack>
+                </Pressable>
 
-              <Pressable>
-                <Icon as={Ionicons} name="share-outline" color="gray.500" size={5} />
-              </Pressable>
-            </HStack>
-          </VStack>
-        </HStack>
-      </Box>
-    </Pressable>
-  );
+                <Pressable onPress={handleDislike}>
+                  <HStack space={2} alignItems="center">
+                    <Icon as={Ionicons} name={disliked ? "thumbs-down" : "thumbs-down-outline"} color="gray.500" size={5} />
+                    <Text color={disliked ? "white" : "gray.500"}>{dislikes}</Text>
+                  </HStack>
+                </Pressable>
+
+                <Pressable>
+                  <Icon as={Ionicons} name="share-outline" color="gray.500" size={5} />
+                </Pressable>
+              </HStack>
+            </VStack>
+          </HStack>
+        </Box>
+      </Pressable>
+    );
+  };
 
   const Header = () => (
     <Box
