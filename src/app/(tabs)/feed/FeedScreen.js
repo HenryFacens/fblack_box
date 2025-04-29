@@ -232,12 +232,6 @@ export default function FeedScreen({ navigation }) {
               )}
 
               <HStack space={6} mt={3}>
-                <Pressable>
-                  <HStack space={2} alignItems="center">
-                    <Icon as={Ionicons} name="chatbubble-outline" color="gray.500" size={5} />
-                    <Text color="gray.500">{post.comentarios.length}</Text>
-                  </HStack>
-                </Pressable>
 
                 <Pressable onPress={handleLike}>
                   <HStack space={2} alignItems="center">
