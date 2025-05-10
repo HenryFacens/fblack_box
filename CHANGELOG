@@ -2,6 +2,106 @@
 
 Este changelog documenta as principais mudanças aplicadas ao app mobile do projeto **Black Box**, incluindo melhorias na autenticação, integração com o backend e refatorações importantes.
 
+## [1.0.2] - 2025-05-10
+
+🛠️ Alteracoes Recentes no Projeto FBLACK_BOX
+
+Este documento tem como objetivo explicar de forma clara e objetiva as principais mudanças implementadas no projeto, especialmente no fluxo de criação, listagem e exibição de reportes, com foco na comunicação entre frontend (React Native) e backend (Node.js + PostgreSQL).
+
+✅ O que foi Adicionado
+
+📸 Integrações com bibliotecas do Expo:
+
+Foram instaladas as seguintes dependências para suporte completo a captura, compressão e envio de imagens, além de acesso à localização do usuário:
+
+npx expo install expo-image-picker expo-media-library
+npx expo install expo-camera
+npx expo install expo-file-system
+npx expo install expo-permissions
+npx expo install expo-location
+npx expo install expo-image-manipulator
+
+📤 Envio de Reportes
+
+Tela ReportScreen.js atualizada com:
+
+Captura de imagem via câmera.
+
+Compressão da imagem.
+
+Captura automática de geolocalização.
+
+Envio multipart/form-data para o backend com:
+
+descricaoReporte
+
+localizacaoReporte
+
+imagemReporte (arquivo)
+
+categoriasReporte (string literal que deve bater com o banco)
+
+statusReporte (fixado como "Pendente")
+
+📥 Listagem de Reportes
+
+FeedScreen.js: os dados são agora exibidos em ordem decrescente (mais recentes primeiro), sem necessidade de alterar o backend.
+
+👤 Tela de Perfil (ProfileScreen.js)
+
+Integração com o endpoint /api/reporte/me.
+
+Mostra apenas os reportes do usuário logado.
+
+Usa nomePerfil do backend como nome e @username.
+
+Conta número de:
+
+Postagens feitas.
+
+Mídias postadas.
+
+Curtidas (mock).
+
+📦 Novos hooks e serviços
+
+useReporte.js:
+
+Novo método buscarMeusReportes().
+
+reporteService.js:
+
+Novo método getMyReportes() para chamada ao endpoint /api/reporte/me.
+
+❌ O que foi Removido/Substituído
+
+Input manual para status e categorias foi substituído por:
+
+Status fixo 'Pendente' para todos os envios.
+
+Categorias devem seguir exatamente os nomes cadastrados no banco.
+
+Input de texto para categoria no frontend será substituído futuramente por um Dropdown com as opções fixas do banco (em progresso).
+
+📁 .env de Referência
+
+# API local para desenvolvimento
+API_URL=http://192.168.0.51:3000/api
+# Em produção, use:
+# API_URL=https://bblackbox-f3btf4c3g7fydhaf.westus-01.azurewebsites.net/api
+
+✨ Importante: substitua 192.168.0.51 pelo IP da máquina local que está rodando o backend.
+
+🚨 Notas para Desenvolvedores
+
+Certifique-se de que o backend esteja acessível via rede local para testes em dispositivos físicos.
+
+Sempre use categorias e status conforme estão cadastrados no banco (categoria.categoriasReporte e status.statusReporte).
+
+O envio de imagem depende de permissões de câmera e arquivos — verifique no seu dispositivo real.
+
+
+
 ---
 
 ## [1.0.1] - 2025-04-17
