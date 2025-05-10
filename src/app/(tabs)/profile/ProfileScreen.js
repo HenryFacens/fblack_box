@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, VStack, HStack, Avatar, Text, Button, Spinner, Box, Image } from 'native-base';
-import axios from 'axios';
-import useAuth from '../../../hooks/useAuth'; // Supondo que você já tem esse hook
+import useAuth from '../../../hooks/useAuth';
+import { useReporte } from '../../../hooks/useReporte';
+import { API_URL } from '../../../config/constants';
 
 export default function ProfileScreen() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { token } = useAuth();
+  const { buscarMeusReportes } = useReporte();
 
-  // Dados do usuário (você pode obter do token ou de outro endpoint)
   const [user, setUser] = useState({
     nome: '',
     fotoPerfil: '',
@@ -21,19 +22,16 @@ export default function ProfileScreen() {
     const fetchMyPosts = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${API_URL}/reporte/me`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setPosts(response.data.data);
+        const reportes = await buscarMeusReportes(token);
+        setPosts(reportes.reverse()); // ordem mais recente primeiro
 
-        // Se quiser pegar dados do usuário do primeiro post:
-        if (response.data.data.length > 0) {
+        if (reportes.length > 0) {
           setUser({
-            nome: response.data.data[0].nomePerfil,
-            fotoPerfil: `${API_URL.replace('/api', '')}/${response.data.data[0].fotoPerfil}`,
-            username: response.data.data[0].nomePerfil.toLowerCase().replace(/\s/g, ''),
-            seguindo: 0, // Substitua pelo valor real se tiver
-            seguidores: 0, // Substitua pelo valor real se tiver
+            nome: reportes[0].nomePerfil,
+            fotoPerfil: `${API_URL.replace('/api', '')}/${reportes[0].fotoPerfil}`,
+            username: reportes[0].nomePerfil.toLowerCase().replace(/\s/g, ''),
+            seguindo: 0,
+            seguidores: 0,
           });
         }
       } catch (err) {
@@ -104,7 +102,6 @@ export default function ProfileScreen() {
           </VStack>
         </HStack>
 
-        {/* Lista de Posts do usuário */}
         <VStack space={4}>
           {loading ? (
             <Box alignItems="center" py={10}>
@@ -140,7 +137,7 @@ export default function ProfileScreen() {
                 )}
                 <HStack space={2} mt={2}>
                   <Text color="gray.400" fontSize="sm">
-                    Categoria: {post.categoriaReporte}
+                    Categoria: {post.categoriasReporte}
                   </Text>
                   <Text color="gray.400">•</Text>
                   <Text 

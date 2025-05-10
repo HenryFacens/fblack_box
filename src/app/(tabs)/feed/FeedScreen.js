@@ -11,7 +11,7 @@ export default function FeedScreen({ navigation }) {
   const [posts, setPosts] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); // Adicionando estado local para erro
+  const [error, setError] = useState(null);
   const { token, checkToken } = useAuth();
 
   const fetchPosts = async () => {
@@ -31,8 +31,10 @@ export default function FeedScreen({ navigation }) {
         }
       });
   
-      console.log('Resposta da API:', response.data); // Debug
-      setPosts(response.data.data);
+      console.log('Resposta da API:', response.data);
+      const ordenado = response.data.data.sort((a, b) => new Date(b.horarioReporte) - new Date(a.horarioReporte));
+      setPosts(ordenado);
+
       setError(null);
     } catch (err) {
       console.error('Erro completo ao buscar posts:', err); // Debug
