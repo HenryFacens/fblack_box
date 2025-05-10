@@ -1,18 +1,57 @@
 // services/reporteService.js
-import api from './api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from '../config/constants';
 
-// services/reporteService.js
+export const postReporte = async ({ descricao, localizacao, categoria, imagemUri, token }) => {
+  const fileName = imagemUri.split('/').pop();
+  const formData = new FormData();
+
+  formData.append('descricaoReporte', descricao);
+  formData.append('localizacaoReporte', localizacao);
+  formData.append('imagemReporte', {
+    uri: imagemUri,
+    name: fileName.endsWith('.jpeg') ? fileName : `${fileName}.jpeg`,
+    type: 'image/jpeg',
+  });
+  formData.append('categoriasReporte', categoria);
+  formData.append('statusReporte', 'Pendente');
+
+  const response = await fetch(`${API_URL}/reporte/create`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'multipart/form-data',
+    },
+    body: formData,
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data?.message || 'Erro ao enviar reporte');
+  }
+  return data;
+};
+
 export const getReportes = async () => {
-    try {
-      const response = await api.get('/reporte/get');
-      return response.data.data; // Retorna o array de reportes
-    } catch (error) {
-      console.log('Erro na requisição:', error.response?.data || error.message);
-      if (error.response?.status === 401) {
-        throw new Error('Sessão expirada');
-      }
-      throw new Error(error.response?.data?.message || 'Erro ao buscar reportes');
-    }
-  };
+  const response = await fetch(`${API_URL}/reporte/get`);
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data?.message || 'Erro ao buscar reportes');
+  }
+
+  const ordenado = data.data.sort((a, b) => new Date(b.horarioReporte) - new Date(a.horarioReporte));
+  return ordenado;
+};
+
+export const getMyReportes = async (token) => {
+  const response = await fetch(`${API_URL}/reporte/me`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data?.message || 'Erro ao buscar seus reportes');
+  }
+  return data.data;
+};

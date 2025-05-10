@@ -5,6 +5,8 @@ import { View, Platform } from 'react-native';
 import FeedScreen from '../app/(tabs)/feed/FeedScreen';
 import MapsScreen from '../app/(tabs)/map/MapScreen';
 import ProfileScreen from '../app/(tabs)/profile/ProfileScreen';
+import ReportScreen from '../app/(tabs)/report/ReportScreen';
+
 
 const Tab = createBottomTabNavigator();
 
@@ -81,6 +83,18 @@ export default function TabRoutes() {
             <TabIcon
               focused={focused}
               icon="person"
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Report"
+        component={ReportScreen}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
+              focused={focused}
+              icon="add-circle"
             />
           ),
         }}
