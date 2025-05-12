@@ -111,8 +111,8 @@ export default function ReportScreen() {
   };
 
   return (
-    <ScrollView flex={1} bg="black" paddingTop={50}>
-      <Center px={4} minH="100vh">
+    <ScrollView flex={1} bg="black" paddingTop={50} contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}>
+      <Center px={4}>
         <Box w="100%" maxW="350">
           <VStack space={4}>
             <Text color="white" fontSize="2xl" fontWeight="bold" textAlign="center">
